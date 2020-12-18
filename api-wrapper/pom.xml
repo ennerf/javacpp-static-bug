@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>issues.javacpp.staticlib</groupId>
+        <artifactId>api-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>api-wrapper</artifactId>
+
+    <properties>
+
+        <cppdir>${basedir}/../cpp</cppdir>
+        <javacpp.packageName>issues.javacpp.staticlib</javacpp.packageName>
+
+        <!-- To skip execution of cppbuild.sh: -Djavacpp.cppbuild.skip=true -->
+        <javacpp.cppbuild.skip>false</javacpp.cppbuild.skip>
+
+        <!-- To skip header file parsing phase: -Djavacpp.parser.skip=true  -->
+        <javacpp.parser.skip>false</javacpp.parser.skip>
+
+        <!-- To skip native compilation phase: -Djavacpp.compiler.skip=true -->
+        <javacpp.compiler.skip>false</javacpp.compiler.skip>
+
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacpp</artifactId>
+            <version>${javacpp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacpp-platform</artifactId>
+            <version>${javacpp.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/java/</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.bytedeco</groupId>
+                <artifactId>javacpp</artifactId>
+                <version>${javacpp.version}</version>
+                <configuration>
+                    <properties>${javacpp.platform}</properties>
+
+                    <!-- Maven directory structure -->
+                    <classPath>${project.build.directory}/classes/</classPath>
+                    <classOrPackageName>${javacpp.packageName}.*</classOrPackageName>
+                    <deleteJniFiles>false</deleteJniFiles>
+
+                    <!-- Paths & Compiler options -->
+                    <includePaths>
+                        <includePath>${cppdir}/</includePath>
+                    </includePaths>
+                    <linkPaths>
+                        <linkPath>${cppdir}/cmake-build-release/</linkPath>
+                    </linkPaths>
+           <!--         <compilerOptions>
+                        <compilerOption>/std:c++17</compilerOption>
+                    </compilerOptions>-->
+
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>javacpp.parser</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Parses header .h into .java JNI definitions -->
+                            <outputDirectory>${project.build.directory}/generated-sources/java/</outputDirectory>
+                            <skip>${javacpp.parser.skip}</skip>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>javacpp.compiler</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Compiles native JNI binaries and creates a distribution-->
+                            <!-- The default output directory is target/classes/<package>/<platform> -->
+                            <copyLibs>false</copyLibs>
+                            <skip>${javacpp.compiler.skip}</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

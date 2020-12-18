@@ -1,0 +1,6 @@
+.idea/
+*.iml
+api-wrapper/target/
+api-test/target/
+cpp/cmake-build-release/
+cpp/test/cmake-build-debug/
