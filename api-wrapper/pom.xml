@@ -63,6 +63,23 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.5.0</version>
+                <executions>
+                    <execution>
+                        <id>compile-native-code</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>${project.basedir}/../cpp/cppbuild.bat</executable>
+                </configuration>
+            </plugin>
 
             <plugin>
                 <groupId>org.bytedeco</groupId>
@@ -81,7 +98,7 @@
                         <includePath>${cppdir}/</includePath>
                     </includePaths>
                     <linkPaths>
-                        <linkPath>${cppdir}/cmake-build-release/</linkPath>
+                        <linkPath>${cppdir}/cmake-build-release_x64/</linkPath>
                     </linkPaths>
            <!--         <compilerOptions>
                         <compilerOption>/std:c++17</compilerOption>
